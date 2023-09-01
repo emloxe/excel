@@ -1,86 +1,109 @@
 import './App.css';
 
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from 'react';
+import React, { useState, useReducer } from 'react';
 import { Layout, theme } from 'antd';
 
 import { InboxOutlined } from '@ant-design/icons';
 
 import { message, Upload, Tabs } from 'antd';
 import xlsx from 'node-xlsx';
-
+import filesReducer from './filesReducer';
 import TabMerge from './tabs/merge';
 const { Header, Content, Footer } = Layout;
 const { Dragger } = Upload;
 
-const uploadProps = {
-  name: 'file',
-  multiple: true,
-  maxCount: 2,
-  listType: 'picture',
-  className: 'upload-list-inline',
-  customRequest(options) {
-    options.onSuccess();
-  },
 
-  onChange(info) {
-    const { status } = info.file;
-    console.log(info.file);
-    if (status === 'removed') {
-    }
-    if (status === 'done') {
-      const isExcel = info.file.name.search(/(.xlsx)|(.xls)/);
 
-      if (isExcel) {
-        console.log(1111);
-        message.error(`${info.file.name} 不支持该格式`);
-      } else {
-        const fileReader = new FileReader();
-        fileReader.readAsArrayBuffer(info.file.originFileObj);
-        fileReader.onload = function () {
-          const workSheetsFromFile = xlsx.parse(fileReader.result);
-          if (workSheetsFromFile[0].data.length > 0) {
-            message.success(`${info.file.name} 文件上传成功`);
-          } else {
-            message.error(`${info.file.name} 请检查文件格式并重新上传`);
-          }
-        };
-      }
-    } else if (status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-  onDrop(e) {
-    console.log('Dropped files', e.dataTransfer.files);
-  },
-};
-
-const tabsItems = [
-  // {
-  //   key: '2',
-  //   label: '表格查重',
-  //   children: 'Content of Tab Pane 2',
-  // },
-  // {
-  //   key: '3',
-  //   label: '表格对比',
-  //   children: 'Content of Tab Pane 3',
-  // },
-  {
-    key: '1',
-    label: '表格合并',
-    children: <TabMerge />,
-  },
-];
 
 const onTabsChange = (key) => {
   // console.log(key);
 };
 
 function App() {
+
+  const [flies, dispatch] = useReducer(filesReducer, []);
+
+
+  const tabsItems = [
+    // {
+    //   key: '2',
+    //   label: '表格查重',
+    //   children: 'Content of Tab Pane 2',
+    // },
+    // {
+    //   key: '3',
+    //   label: '表格对比',
+    //   children: 'Content of Tab Pane 3',
+    // },
+    {
+      key: '1',
+      label: '表格合并',
+      children: <TabMerge flies={{flies}}/>,
+    },
+  ];
+  
+
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+
+
+  const uploadProps = {
+    name: 'file',
+    multiple: true,
+    maxCount: 2,
+    listType: 'picture',
+    className: 'upload-list-inline',
+    customRequest(options) {
+      options.onSuccess();
+    },
+  
+    onChange(info) {
+      const { status } = info.file;
+      console.log(info.file);
+      if (status === 'removed') {
+
+        dispatch({
+          type: 'deleted',
+          id: info.file.uid,
+        });
+
+      }
+      if (status === 'done') {
+        const isExcel = info.file.name.search(/(.xlsx)|(.xls)/);
+  
+        if ( !isExcel  ) {
+          console.log(222)
+          message.error(`${info.file.name} 不支持该格式`);
+        } else {
+          const fileReader = new FileReader();
+          fileReader.readAsArrayBuffer(info.file.originFileObj);
+          fileReader.onload = function () {
+            const workSheetsFromFile = xlsx.parse(fileReader.result);
+            if (workSheetsFromFile[0].data.length > 0) {
+              message.success(`${info.file.name} 文件上传成功`);
+
+              dispatch({
+                type: 'added',
+                id: info.file.uid,
+                data: workSheetsFromFile[0].data,
+              });
+
+            } else {
+              message.error(`${info.file.name} 请检查文件格式并重新上传`);
+            }
+          };
+        }
+      } else if (status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+    onDrop(e) {
+      console.log('Dropped files', e.dataTransfer.files);
+    },
+  };
+
 
   return (
     <Layout>

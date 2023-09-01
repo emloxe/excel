@@ -1,5 +1,7 @@
 # Getting Started with Create React App
 
+action 配置  https://blog.csdn.net/nxg0916/article/details/127271859
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
