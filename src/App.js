@@ -39,7 +39,7 @@ function App() {
     {
       key: '1',
       label: '表格合并',
-      children: <TabMerge flies={{flies}}/>,
+      children: <TabMerge flies={flies}/>,
     },
   ];
   
@@ -74,7 +74,6 @@ function App() {
         const isExcel = info.file.name.search(/(.xlsx)|(.xls)/);
   
         if ( !isExcel  ) {
-          console.log(222)
           message.error(`${info.file.name} 不支持该格式`);
         } else {
           const fileReader = new FileReader();
