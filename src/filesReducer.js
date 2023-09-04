@@ -1,19 +1,15 @@
 export default function fliesReducer(flies, action) {
   switch (action.type) {
     case 'added': {
+      console.log('action', flies, action);
 
 
-      console.log('action',flies,  action)
-
-      const  thead = action.data.shift();
-      const theadOption = thead.map(element => {
-       return { value: element, label: element }
-      });
       return [
         ...flies,
         {
-          id: action.id,
-          theadOption: theadOption,
+          id: action.id,  
+          // theadOption: theadOption,
+          theadOption: action.theadOption,
           data: action.data,
         },
       ];

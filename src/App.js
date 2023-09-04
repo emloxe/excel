@@ -13,17 +13,12 @@ import TabMerge from './tabs/merge';
 const { Header, Content, Footer } = Layout;
 const { Dragger } = Upload;
 
-
-
-
 const onTabsChange = (key) => {
   // console.log(key);
 };
 
 function App() {
-
   const [flies, dispatch] = useReducer(filesReducer, []);
-
 
   const tabsItems = [
     // {
@@ -39,15 +34,13 @@ function App() {
     {
       key: '1',
       label: '表格合并',
-      children: <TabMerge flies={flies}/>,
+      children: <TabMerge flies={flies} />,
     },
   ];
-  
 
   const {
     token: { colorBgContainer },
   } = theme.useToken();
-
 
   const uploadProps = {
     name: 'file',
@@ -58,22 +51,20 @@ function App() {
     customRequest(options) {
       options.onSuccess();
     },
-  
+
     onChange(info) {
       const { status } = info.file;
       console.log(info.file);
       if (status === 'removed') {
-
         dispatch({
           type: 'deleted',
           id: info.file.uid,
         });
-
       }
       if (status === 'done') {
         const isExcel = info.file.name.search(/(.xlsx)|(.xls)/);
-  
-        if ( !isExcel  ) {
+
+        if (!isExcel) {
           message.error(`${info.file.name} 不支持该格式`);
         } else {
           const fileReader = new FileReader();
@@ -83,12 +74,17 @@ function App() {
             if (workSheetsFromFile[0].data.length > 0) {
               message.success(`${info.file.name} 文件上传成功`);
 
+              const thead = workSheetsFromFile[0].data.shift();
+              const theadOption = thead.map((element) => {
+                return { value: element, label: element };
+              });
+
               dispatch({
                 type: 'added',
                 id: info.file.uid,
                 data: workSheetsFromFile[0].data,
+                theadOption,
               });
-
             } else {
               message.error(`${info.file.name} 请检查文件格式并重新上传`);
             }
@@ -102,7 +98,6 @@ function App() {
       console.log('Dropped files', e.dataTransfer.files);
     },
   };
-
 
   return (
     <Layout>
