@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Select, Checkbox, Button, message } from 'antd';
+import { Form, Select, Checkbox, Button, message, Modal, Input } from 'antd';
 import xlsx from 'node-xlsx';
 import { SwapOutlined } from '@ant-design/icons';
+
+import moment from 'moment-timezone';
 
 import { jointData, obj2arr, getThead, savefiles } from '../utils';
 
@@ -28,6 +30,10 @@ function TabMerge({ flies }) {
   const [exportList1, setExportList1] = useState([]);
   const [exportList2, setExportList2] = useState([]);
 
+  // 弹框
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filename, setFilename] = useState('');
+
   useEffect(() => {
     console.log('每次都会执行');
 
@@ -51,9 +57,6 @@ function TabMerge({ flies }) {
     ]);
   }, [flies]);
 
-
-
-
   const exportHandler = () => {
     if (flies.length <= 1) {
       message.error(`需要上传2个文件`);
@@ -70,6 +73,14 @@ function TabMerge({ flies }) {
       return;
     }
 
+    // 创建一个时间对象，并设置为中国时区
+    var now = moment.tz('Asia/Shanghai').format();
+    // 输出当前时间和时区
+    setFilename(now.slice(0, 10));
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
     const obj = jointData(flies[0].data, uniqueKey1, flies[1].data, uniqueKey2);
     const data = obj2arr(obj, exportList1, exportList2);
     const thead = getThead(
@@ -81,17 +92,18 @@ function TabMerge({ flies }) {
 
     data.unshift(thead);
 
-    var buffer = xlsx.build([{name: 'mySheetName', data: data}]);
+    var buffer = xlsx.build([{ name: 'Sheet1', data: data }]);
 
-var name = 'f.xlsx';
-savefiles(buffer, name);
-    // const objUrl = URL.createObjectURL(new File(buffer, "filename.xlsx"));
-    console.log(exportList1, exportList2, flies);
-    console.log(333333333, data);
+    savefiles(buffer, filename);
   };
 
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
-
+  const onFlieNameChange = (e) => {
+    setFilename(e.target.value);
+  };
 
   return (
     <div>
@@ -143,6 +155,17 @@ savefiles(buffer, name);
       <Button type="primary" onClick={exportHandler}>
         导出数据
       </Button>
+
+      <Modal
+        title="下载提示"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <Form.Item label="文件名称">
+          <Input onChange={onFlieNameChange} defaultValue={filename} />
+        </Form.Item>
+      </Modal>
     </div>
   );
 }
