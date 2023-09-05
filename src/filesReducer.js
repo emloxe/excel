@@ -8,7 +8,6 @@ export default function fliesReducer(flies, action) {
         ...flies,
         {
           id: action.id,  
-          // theadOption: theadOption,
           theadOption: action.theadOption,
           data: action.data,
         },

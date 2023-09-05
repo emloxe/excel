@@ -75,8 +75,8 @@ function App() {
               message.success(`${info.file.name} 文件上传成功`);
 
               const thead = workSheetsFromFile[0].data.shift();
-              const theadOption = thead.map((element) => {
-                return { value: element, label: element };
+              const theadOption = thead.map((element, index) => {
+                return { value: index, label: element };
               });
 
               dispatch({
