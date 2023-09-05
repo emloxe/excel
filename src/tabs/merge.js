@@ -34,6 +34,13 @@ function TabMerge({ flies }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filename, setFilename] = useState('');
 
+  const clearChoose = () =>  {
+    setUniqueKey1('')
+    setUniqueKey2('')
+    setExportList1([])
+    setExportList2([])
+  }
+
   useEffect(() => {
     console.log('每次都会执行');
 
@@ -55,6 +62,8 @@ function TabMerge({ flies }) {
         options: flies[1] ? flies[1].theadOption : [],
       },
     ]);
+
+    clearChoose()
   }, [flies]);
 
   const exportHandler = () => {
@@ -94,7 +103,7 @@ function TabMerge({ flies }) {
 
     var buffer = xlsx.build([{ name: 'Sheet1', data: data }]);
 
-    savefiles(buffer, filename);
+    savefiles(buffer, filename + '.xlsx');
   };
 
   const handleCancel = () => {
