@@ -69,20 +69,20 @@ function TabMerge({ flies }) {
   }, [flies]);
 
   const exportHandler = () => {
-    // if (flies.length <= 1) {
-    //   message.error(`需要上传2个文件`);
-    //   return;
-    // }
+    if (flies.length <= 1) {
+      message.error(`需要上传2个文件`);
+      return;
+    }
 
-    // if (!(uniqueKey1 !== '' || uniqueKey2 !== '')) {
-    //   message.error(`id对应值必须选`);
-    //   return;
-    // }
+    if (!(uniqueKey1 !== '' || uniqueKey2 !== '')) {
+      message.error(`id对应值必须选`);
+      return;
+    }
 
-    // if (!(exportList1.length > 0 || exportList2.length > 0)) {
-    //   message.error(`需要导出的项至少选一个`);
-    //   return;
-    // }
+    if (!(exportList1.length > 0 || exportList2.length > 0)) {
+      message.error(`需要导出的项至少选一个`);
+      return;
+    }
 
     // 创建一个时间对象，并设置为中国时区
     var now = moment.tz('Asia/Shanghai').format();
