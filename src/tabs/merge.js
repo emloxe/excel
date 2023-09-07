@@ -10,6 +10,8 @@ import { jointData, obj2arr, getThead, savefiles } from '../utils';
 const CheckboxGroup = Checkbox.Group;
 
 function TabMerge({ flies }) {
+  const [messageApi, contextHolder] = message.useMessage();
+
   const [firstOptions, setFirstOptions] = useState([]);
   const [secondOptions, setSecondOptions] = useState([]);
   const [groupOptions, setGroupOptions] = useState([
@@ -34,12 +36,12 @@ function TabMerge({ flies }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filename, setFilename] = useState('');
 
-  const clearChoose = () =>  {
-    setUniqueKey1('')
-    setUniqueKey2('')
-    setExportList1([])
-    setExportList2([])
-  }
+  const clearChoose = () => {
+    setUniqueKey1('');
+    setUniqueKey2('');
+    setExportList1([]);
+    setExportList2([]);
+  };
 
   useEffect(() => {
     console.log('每次都会执行');
@@ -63,24 +65,24 @@ function TabMerge({ flies }) {
       },
     ]);
 
-    clearChoose()
+    clearChoose();
   }, [flies]);
 
   const exportHandler = () => {
-    if (flies.length <= 1) {
-      message.error(`需要上传2个文件`);
-      return;
-    }
+    // if (flies.length <= 1) {
+    //   message.error(`需要上传2个文件`);
+    //   return;
+    // }
 
-    if (!(uniqueKey1 !== '' || uniqueKey2 !== '')) {
-      message.error(`id对应值必须选`);
-      return;
-    }
+    // if (!(uniqueKey1 !== '' || uniqueKey2 !== '')) {
+    //   message.error(`id对应值必须选`);
+    //   return;
+    // }
 
-    if (!(exportList1.length > 0 || exportList2.length > 0)) {
-      message.error(`需要导出的项至少选一个`);
-      return;
-    }
+    // if (!(exportList1.length > 0 || exportList2.length > 0)) {
+    //   message.error(`需要导出的项至少选一个`);
+    //   return;
+    // }
 
     // 创建一个时间对象，并设置为中国时区
     var now = moment.tz('Asia/Shanghai').format();
@@ -90,6 +92,13 @@ function TabMerge({ flies }) {
   };
 
   const handleOk = () => {
+    setIsModalOpen(false);
+
+    messageApi.open({
+      type: 'loading',
+      content: '正在处理数据中...',
+      duration: 0,
+    });
     const obj = jointData(flies[0].data, uniqueKey1, flies[1].data, uniqueKey2);
     const data = obj2arr(obj, exportList1, exportList2);
     const thead = getThead(
@@ -104,6 +113,9 @@ function TabMerge({ flies }) {
     var buffer = xlsx.build([{ name: 'Sheet1', data: data }]);
 
     savefiles(buffer, filename + '.xlsx');
+
+    messageApi.destroy();
+    messageApi.success('处理完成');
   };
 
   const handleCancel = () => {
@@ -116,6 +128,7 @@ function TabMerge({ flies }) {
 
   return (
     <div>
+      {contextHolder}
       <Form.Item label="id对应值">
         <Select
           options={firstOptions}
