@@ -32,9 +32,10 @@ export const jointData = (arr1, keyIndex1, arr2, keyIndex2) => {
  * @param {Object} obj JointData返回的数据
  * @param {Array} arrIndex1 索引值数组
  * @param {Array} arrIndex2 索引值数组
+ * @param {Array[]} division 二维数组
  * @returns
  */
-export const obj2arr = (obj, arrIndex1, arrIndex2) => {
+export const obj2arr = (obj, arrIndex1, arrIndex2, division) => {
   const arrAll = [];
 
   Object.values(obj).forEach(([arr1, arr2]) => {
@@ -47,6 +48,29 @@ export const obj2arr = (obj, arrIndex1, arrIndex2) => {
     arrIndex2.forEach((index) => {
       arr.push(arr2[index]);
     });
+
+
+    // 处理除法
+    if(division) {
+      const [dividendArr, divisorArr] = division;
+      let dividend = 0;
+      let divisor = 1;
+
+      if(dividendArr[0] === 0) {
+        dividend = arr1[dividendArr[1]]
+      } else {
+        dividend = arr2[dividendArr[1]]
+      }
+
+      if(divisorArr[0] === 0) {
+        divisor = arr1[divisorArr[1]]
+      } else {
+        divisor = arr2[divisorArr[1]]
+      }
+
+      const num = (dividend / divisor).toFixed(1)
+      arr.push(num)
+    }
 
     arrAll.push(arr);
   });
@@ -75,6 +99,17 @@ export const getThead = (arr1, arrIndex1, arr2, arrIndex2) => {
   return arr;
 };
 
+
+const dealDivision = () => {
+
+}
+
+
+/**
+ * 下载
+ * @param {*} data 数据值
+ * @param {*} name 下载的文件名称
+ */
 export function savefiles(data, name) {
   //Blob为js的一个对象，表示一个不可变的, 原始数据的类似文件对象，这是创建文件中不可缺少的！
   var urlObject = window.URL || window.webkitURL || window;

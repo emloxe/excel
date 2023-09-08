@@ -1,5 +1,17 @@
+// 表格合并
+
 import React, { useState, useEffect } from 'react';
-import { Form, Select, Checkbox, Button, message, Modal, Input } from 'antd';
+import {
+  Form,
+  Select,
+  Checkbox,
+  Button,
+  message,
+  Modal,
+  Input,
+  Cascader,
+  Alert
+} from 'antd';
 import xlsx from 'node-xlsx';
 import { SwapOutlined } from '@ant-design/icons';
 
@@ -14,16 +26,7 @@ function TabMerge({ flies }) {
 
   const [firstOptions, setFirstOptions] = useState([]);
   const [secondOptions, setSecondOptions] = useState([]);
-  const [groupOptions, setGroupOptions] = useState([
-    {
-      label: '组1',
-      options: [],
-    },
-    {
-      label: '组2',
-      options: [],
-    },
-  ]);
+  const [groupOptions, setGroupOptions] = useState([]);
 
   // 需要将两个表联立的列
   const [uniqueKey1, setUniqueKey1] = useState('');
@@ -31,39 +34,51 @@ function TabMerge({ flies }) {
   // 需要导出的数据列
   const [exportList1, setExportList1] = useState([]);
   const [exportList2, setExportList2] = useState([]);
+  // 除法计算的数据
+  const [dividendArr, setDividendArr] = useState([]); // 被除数
+  const [divisorArr, setDivisorArr] = useState([]); // 除数
 
   // 弹框
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filename, setFilename] = useState('');
 
+  // 清空数据
   const clearChoose = () => {
     setUniqueKey1('');
     setUniqueKey2('');
     setExportList1([]);
     setExportList2([]);
+
+    setDividendArr([]);
+    setDivisorArr([]);
   };
 
   useEffect(() => {
     console.log('每次都会执行');
 
+    const groupOption = [];
+
     if (flies[0]) {
       setFirstOptions(flies[0].theadOption);
+
+      groupOption.push({
+        label: '组1',
+        value: 0,
+        children: flies[0].theadOption,
+      });
     }
 
     if (flies[1]) {
       setSecondOptions(flies[1].theadOption);
+
+      groupOption.push({
+        label: '组2',
+        value: 1,
+        children: flies[1].theadOption,
+      });
     }
 
-    setGroupOptions([
-      {
-        label: '组1',
-        options: flies[0] ? flies[0].theadOption : [],
-      },
-      {
-        label: '组2',
-        options: flies[1] ? flies[1].theadOption : [],
-      },
-    ]);
+    setGroupOptions(groupOption);
 
     clearChoose();
   }, [flies]);
@@ -100,7 +115,14 @@ function TabMerge({ flies }) {
       duration: 0,
     });
     const obj = jointData(flies[0].data, uniqueKey1, flies[1].data, uniqueKey2);
-    const data = obj2arr(obj, exportList1, exportList2);
+
+    const division =
+      (dividendArr.length > 0) & (divisorArr.length > 0)
+        ? [dividendArr, divisorArr]
+        : undefined;
+
+    const data = obj2arr(obj, exportList1, exportList2, division);
+    // 处理表头
     const thead = getThead(
       flies[0].theadOption,
       exportList1,
@@ -111,7 +133,6 @@ function TabMerge({ flies }) {
     data.unshift(thead);
 
     var buffer = xlsx.build([{ name: 'Sheet1', data: data }]);
-
     savefiles(buffer, filename + '.xlsx');
 
     messageApi.destroy();
@@ -128,6 +149,9 @@ function TabMerge({ flies }) {
 
   return (
     <div>
+      <Alert message="需要上传2个文件" type="info" />
+      <br />
+
       {contextHolder}
       <Form.Item label="id对应值">
         <Select
@@ -164,15 +188,21 @@ function TabMerge({ flies }) {
         />
       </Form.Item>
       <Form.Item label="两项相除">
-        <Select
+        <Cascader
           options={groupOptions}
+          onChange={(value) => {
+            setDividendArr(value);
+          }}
           style={{ width: 200, margin: '0 10px' }}
-        ></Select>{' '}
+        />
         /
-        <Select
+        <Cascader
           options={groupOptions}
+          onChange={(value) => {
+            setDivisorArr(value);
+          }}
           style={{ width: 200, margin: '0 10px' }}
-        ></Select>
+        />
       </Form.Item>
       <Button type="primary" onClick={exportHandler}>
         导出数据

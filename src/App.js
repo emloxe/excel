@@ -10,6 +10,7 @@ import { message, Upload, Tabs } from 'antd';
 import xlsx from 'node-xlsx';
 import filesReducer from './filesReducer';
 import TabMerge from './tabs/merge';
+import TabRepeat from './tabs/repeat';
 const { Header, Content, Footer } = Layout;
 const { Dragger } = Upload;
 
@@ -21,18 +22,18 @@ function App() {
   const [flies, dispatch] = useReducer(filesReducer, []);
 
   const tabsItems = [
-    // {
-    //   key: '2',
-    //   label: '表格查重',
-    //   children: 'Content of Tab Pane 2',
-    // },
+    {
+      key: '1',
+      label: '表格查重',
+      children:   <TabRepeat flies={flies} />,
+    },
     // {
     //   key: '3',
     //   label: '表格对比',
     //   children: 'Content of Tab Pane 3',
     // },
     {
-      key: '1',
+      key: '3',
       label: '表格合并',
       children: <TabMerge flies={flies} />,
     },
