@@ -22,11 +22,11 @@ function App() {
   const [flies, dispatch] = useReducer(filesReducer, []);
 
   const tabsItems = [
-    {
-      key: '1',
-      label: '表格查重',
-      children:   <TabRepeat flies={flies} />,
-    },
+    // {
+    //   key: '1',
+    //   label: '表格查重',
+    //   children:   <TabRepeat flies={flies} />,
+    // },
     // {
     //   key: '3',
     //   label: '表格对比',
@@ -75,6 +75,8 @@ function App() {
             if (workSheetsFromFile[0].data.length > 0) {
               message.success(`${info.file.name} 文件上传成功`);
 
+              console.log('文件为', workSheetsFromFile)
+
               const thead = workSheetsFromFile[0].data.shift();
               const theadOption = thead.map((element, index) => {
                 return { value: index, label: element };
@@ -96,7 +98,7 @@ function App() {
       }
     },
     onDrop(e) {
-      console.log('Dropped files', e.dataTransfer.files);
+      // console.log('Dropped files', e.dataTransfer.files);
     },
   };
 
