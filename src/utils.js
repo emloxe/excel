@@ -38,44 +38,59 @@ export const jointData = (arr1, keyIndex1, arr2, keyIndex2) => {
 export const obj2arr = (obj, arrIndex1, arrIndex2, division) => {
   const arrAll = [];
 
-  Object.values(obj).forEach(([arr1, arr2]) => {
-    const arr = [];
+  Object.values(obj).forEach((objValue) => {
+    const len = objValue.length;
 
-    arrIndex1.forEach((index) => {
-      arr.push(arr1[index]);
-    });
+    for (let i = 1; i < len; i++) {
+      const arr = getArrOne(
+        objValue[0],
+        objValue[i],
+        arrIndex1,
+        arrIndex2,
+        division
+      );
 
-    arrIndex2.forEach((index) => {
-      arr.push(arr2[index]);
-    });
-
-
-    // 处理除法
-    if(division) {
-      const [dividendArr, divisorArr] = division;
-      let dividend = 0;
-      let divisor = 1;
-
-      if(dividendArr[0] === 0) {
-        dividend = arr1[dividendArr[1]]
-      } else {
-        dividend = arr2[dividendArr[1]]
-      }
-
-      if(divisorArr[0] === 0) {
-        divisor = arr1[divisorArr[1]]
-      } else {
-        divisor = arr2[divisorArr[1]]
-      }
-
-      const num = (dividend / divisor).toFixed(1)
-      arr.push(num)
+      arrAll.push(arr);
     }
-
-    arrAll.push(arr);
   });
 
   return arrAll;
+};
+
+const getArrOne = function (arr1, arr2, arrIndex1, arrIndex2, division) {
+  const arr = [];
+
+  arrIndex1.forEach((index) => {
+    arr.push(arr1[index]);
+  });
+
+  arrIndex2.forEach((index) => {
+    arr.push(arr2[index]);
+  });
+
+  // 处理除法
+  if (division) {
+    const [dividendArr, divisorArr] = division;
+    let dividend = 0;
+    let divisor = 1;
+
+    if (dividendArr[0] === 0) {
+      dividend = arr1[dividendArr[1]];
+    } else {
+      dividend = arr2[dividendArr[1]];
+    }
+
+    if (divisorArr[0] === 0) {
+      divisor = arr1[divisorArr[1]];
+    } else {
+      divisor = arr2[divisorArr[1]];
+    }
+
+    const num = (dividend / divisor).toFixed(1);
+    arr.push(num);
+  }
+
+  return arr;
 };
 
 /**
@@ -99,11 +114,7 @@ export const getThead = (arr1, arrIndex1, arr2, arrIndex2) => {
   return arr;
 };
 
-
-const dealDivision = () => {
-
-}
-
+const dealDivision = () => {};
 
 /**
  * 下载
